@@ -96,7 +96,35 @@ Bleeding-edge features under active development:
 | [`useLogger`](https://hooks.khulnasoft.com/uselogger) | Lifecycle logging for components |
 | [`usePageLeave`](https://hooks.khulnasoft.com/usepageleave) | Detect mouse leaving the page |
 | [`useRandomInterval`](https://hooks.khulnasoft.com/userandominterval) | Randomized interval execution |
+| [`useSpeech`](https://hooks.khulnasoft.com/usespeech) | Text-to-speech synthesis |
 | [`useTimeout`](https://hooks.khulnasoft.com/usetimeout) | Delay logic using timeout |
+
+---
+
+## ✨ Recent Improvements
+
+The library has undergone significant enhancements to improve code quality, type safety, and developer experience:
+
+### 🔧 **Code Quality & Standards**
+- **Standardized API patterns**: All hooks now return consistent array tuples for destructuring
+- **Unified null/undefined handling**: Consistent use of `undefined` instead of `null` across all hooks
+- **Enhanced error boundaries**: Comprehensive error handling with try-catch blocks and graceful fallbacks
+- **Optimized event listeners**: Added passive event listeners for better performance and proper cleanup
+
+### 🛡️ **Type Safety Improvements**
+- **Updated TypeScript definitions**: All return types now use `undefined` instead of `null` for consistency
+- **Fixed generic types**: Corrected `useMap<K, V>` and `useObjectState` callback types
+- **Enhanced type coverage**: Improved type definitions for battery, geolocation, and network state
+
+### 🚀 **Performance Optimizations**
+- **Ref-based patterns**: Optimized `usePrevious` to use ref pattern instead of dual state variables
+- **Memory leak prevention**: Added proper cleanup in `useRenderInfo` and observer-based hooks
+- **Efficient storage handling**: Improved JSON parsing with error recovery for localStorage/sessionStorage
+
+### 📱 **Enhanced Features**
+- **Permission handling**: Added proper permission denied state for `useGeolocation`
+- **Browser compatibility**: Enhanced `useBattery` with comprehensive browser support checks
+- **Timing fixes**: Resolved `useThrottle` timing bugs and improved leading edge handling
 
 ---
 

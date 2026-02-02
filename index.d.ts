@@ -3,23 +3,25 @@ import * as React from "react";
 export type BatteryManager = {
   supported: boolean;
   loading: boolean;
-  level: number | null;
-  charging: boolean | null;
-  chargingTime: number | null;
-  dischargingTime: number | null;
+  level: number | undefined;
+  charging: boolean | undefined;
+  chargingTime: number | undefined;
+  dischargingTime: number | undefined;
+  error: Error | undefined;
 };
 
 export type GeolocationState = {
   loading: boolean;
-  accuracy: number | null;
-  altitude: number | null;
-  altitudeAccuracy: number | null;
-  heading: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  speed: number | null;
-  timestamp: number | null;
-  error: GeolocationPositionError | null;
+  accuracy: number | undefined;
+  altitude: number | undefined;
+  altitudeAccuracy: number | undefined;
+  heading: number | undefined;
+  latitude: number | undefined;
+  longitude: number | undefined;
+  speed: number | undefined;
+  timestamp: number | undefined;
+  error: GeolocationPositionError | undefined;
+  permissionDenied: boolean;
 };
 
 export type HistoryState<T> = {
@@ -58,12 +60,12 @@ export type MousePosition = {
 
 export type NetworkState = {
   online: boolean;
-  downlink: number | null;
-  downlinkMax: number | null;
-  effectiveType: string | null;
-  rtt: number | null;
-  saveData: boolean | null;
-  type: string | null;
+  downlink: number | undefined;
+  downlinkMax: number | undefined;
+  effectiveType: string | undefined;
+  rtt: number | undefined;
+  saveData: boolean | undefined;
+  type: string | undefined;
 };
 
 export type CustomList<T> = {
@@ -188,13 +190,13 @@ declare module "reactum" {
     options?: LongPressOptions
   ): LongPressFns;
 
-  export function useMap<T>(initialState?: T): Map<T, any>;
+  export function useMap<K, V>(initialState?: [K, V][]): Map<K, V>;
 
   export function useMeasure<T extends Element>(): [
     React.RefCallback<T>,
     {
-      width: number | null;
-      height: number | null;
+      width: number | undefined;
+      height: number | undefined;
     }
   ];
 
@@ -207,7 +209,7 @@ declare module "reactum" {
 
   export function useNetworkState(): NetworkState;
 
-  export function useObjectState<T>(initialValue: T): [T, (arg: T) => void];
+  export function useObjectState<T>(initialValue: T): [T, (arg: T | ((prev: T) => T)) => void];
 
   export function useOrientation(): {
     angle: number;
@@ -233,31 +235,101 @@ declare module "reactum" {
 
   export function useSessionStorage<T>(
     key: string,
-    initialValue: T
+    initialValue?: T
   ): [T, React.Dispatch<React.SetStateAction<T>>];
 
   export function useSet<T>(values?: T[]): Set<T>;
 
+  export function useContinuousRetry<T>(fn: () => Promise<T>, options?: {
+    maxAttempts?: number;
+    delay?: number;
+    backoff?: number;
+    onRetry?: (error: Error, attempt: number, delay: number) => void;
+    onSuccess?: (result: T, attempt: number) => void;
+    onError?: (error: Error, maxAttempts: number) => void;
+  }): {
+    attempts: number;
+    loading: boolean;
+    error: Error | undefined;
+    data: T | undefined;
+    retry: () => Promise<T>;
+    reset: () => void;
+  };
+
+  export function useCountdown(initialSeconds: number, options?: {
+    onComplete?: () => void;
+    onTick?: (seconds: number) => void;
+  }): {
+    countdown: number;
+    isRunning: boolean;
+    start: () => void;
+    pause: () => void;
+    reset: (seconds?: number) => void;
+  };
+
+  export function useEventListener<T extends Element>(
+    eventName: string,
+    handler: (event: Event) => void,
+    element?: T | Window
+  ): void;
+
+  export function useFetch<T = any>(url: string, options?: RequestInit): {
+    data: T | undefined;
+    loading: boolean;
+    error: Error | undefined;
+    execute: (overrideUrl?: string, overrideOptions?: RequestInit) => Promise<T>;
+  };
+
+  export function useInterval(callback: () => void, delay: number | null): void;
+
+  export function useIntervalWhen(callback: () => void, delay: number | null, when: boolean): void;
+
+  export function useKeyPress(targetKey: string, options?: {
+    target?: Window | Element;
+  }): [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+
+  export function useLogger(name: string, options?: {
+    enabled?: boolean;
+  }): {
+    log: (...args: any[]) => void;
+    warn: (...args: any[]) => void;
+    error: (...args: any[]) => void;
+  };
+
+  export function usePageLeave(onPageLeave: (event: MouseEvent) => void, options?: {
+    threshold?: number;
+  }): void;
+
+  export function useRandomInterval(callback: () => void, minDelay: number | null, maxDelay: number | null): void;
+
+  export function useTimeout(callback: () => void, delay: number | null): void;
+
   export function useSpeech(text: string, options?: SpeechOptions): SpeechState;
 
-  export function useThrottle<T>(value: T, delay: number): T;
+  export function useThrottle<T>(value: T, delay: number): [T, React.Dispatch<React.SetStateAction<T>>];
 
   export function useToggle(
     initialValue?: boolean
   ): [boolean, (newValue?: boolean) => void];
 
-  export function useVisibilityChange(): boolean;
+  export function useVisibilityChange(): [boolean];
 
   export function useWindowScroll(): [
     {
-      x: number | null;
-      y: number | null;
+      x: number | undefined;
+      y: number | undefined;
     },
     (args: unknown) => void
   ];
 
-  export function useWindowSize(): {
-    width: number | null;
-    height: number | null;
-  };
+  export function useWindowSize(): [
+    {
+      width: number | undefined;
+      height: number | undefined;
+    },
+    React.Dispatch<React.SetStateAction<{
+      width: number | undefined;
+      height: number | undefined;
+    }>>
+  ];
 }
